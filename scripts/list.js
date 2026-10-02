@@ -2,7 +2,7 @@ const param = new URLSearchParams(window.location.search);
 const selectedSeason = param.get("season");
 console.log("selectedSeason", selectedSeason);
 
-const productURL = `https://kea-alt-del.dk/t7/api/products?season=${selectedSeason}&limit=50`;
+const productURL = `https://kea-alt-del.dk/t7/api/products?season=${selectedSeason}&limit=100`;
 const listContainer = document.querySelector(".product_list_container");
 
 let allData;
@@ -16,9 +16,12 @@ function getData(url) {
   });
 }
 
+document.querySelector(".back_button").addEventListener("click", event => {window.history.back()});
+
 const filterGenderButtons = document.querySelectorAll(".filter_gender_buttons_container div");
 filterGenderButtons.forEach((button) => {
   button.addEventListener("click", (event) => {
+    console.log("event", event);
     filterGenderButtons.forEach((button) => {
       button.classList.remove("selcted");
     });
@@ -44,6 +47,17 @@ filterSeasonButtons.forEach((button) => {
   button.addEventListener("click", (event) => {
     window.location.href = `productlist.html?season=${event.target.dataset.season}`;
   });
+});
+
+const sortButton = document.querySelector(".sort_button");
+sortButton.addEventListener("click", event => {
+     const sortedData = allData.sort((a, b) => {
+    const actualPriceA = a.discount ? getDiscountPrice(a.price, a.discount) : a.price;
+    const actualPriceB = b.discount ? getDiscountPrice(b.price, b.discount) : b.price;
+
+    return actualPriceA - actualPriceB;
+  });
+  showProducts(sortedData);
 });
 
 function showProducts(products) {
